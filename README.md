@@ -9,27 +9,30 @@ Like dotfiles, but for pi.
 | Directory | Description |
 |-----------|-------------|
 | `extensions/` | Extensions — add capabilities, intercept events, register tools |
-| `themes/` | Rosé Pine dark, moon & dawn |
+| `themes/` | Custom TUI themes |
 | `skills/` | Custom skills |
 | `prompts/` | Custom prompt templates |
 
 ## Install
 
 ```bash
-# From git
+# Global install from git
 pi install git:github.com/speniti/dotpi
 
-# Try without installing
-pi -e ~/Code/dotpi
+# Per-project install — writes to .pi/settings.json so your team gets the same resources
+pi install -l git:github.com/speniti/dotpi
 ```
 
-## Project-local install
+### Try without installing
+
+Clone the repo first, then point pi to the local copy:
 
 ```bash
-pi install -l ~/Code/dotpi
+git clone https://github.com/speniti/dotpi.git
+pi -e ./dotpi
 ```
 
-This writes to `.pi/settings.json` so your team gets the same resources automatically.
+This loads the package into a temporary directory for the current run only.
 
 ## Adding new resources
 
@@ -69,6 +72,10 @@ themes/
 
 All resources are auto-discovered — no registration needed.
 
+## License
+
+[MIT](LICENSE)
+
 ## Development
 
 ### Tooling
@@ -89,14 +96,10 @@ Extensions follow a consistent layout:
 ```
 extensions/<name>/
   index.ts               # Entry point (composition root)
-  src/guards/            # or src/tools/, src/handlers/ etc.
+  src/                   # Source code
   tests/
     <name>.test.ts
-    fixtures/mocks/
+    fixtures/mocks/      # Optional — only when SDK mocks are needed
 ```
 
-Vitest coverage is configured to track only `src/` directories.
-
-## License
-
-MIT
+> **Note:** Vitest coverage tracks only files under `src/`. The composition root (`index.ts`), tests, and mocks are excluded.
