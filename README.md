@@ -1,13 +1,15 @@
-# pi-extensions
+# dotpi
 
-Personal [pi](https://github.com/badlogic/pi-mono) extensions, skills, themes, and prompts.
+Personal [pi](https://github.com/badlogic/pi-mono) coding agent setup — extensions, skills, themes, and prompts.
+
+Like dotfiles, but for pi.
 
 ## Contents
 
 | Directory | Description |
 |-----------|-------------|
 | `extensions/guardrails/` | Safety guardrails — confirm destructive bash commands, protect sensitive paths, safeguard session actions, check dirty git repos |
-| `themes/` | Custom themes (Rosé Pine dark & dawn) |
+| `themes/` | Rosé Pine dark, moon & dawn |
 | `skills/` | Custom skills |
 | `prompts/` | Custom prompt templates |
 
@@ -15,22 +17,22 @@ Personal [pi](https://github.com/badlogic/pi-mono) extensions, skills, themes, a
 
 ```bash
 # From local path
-pi install ~/Code/pi-extensions
+pi install ~/Code/dotpi
 
 # From git (after pushing to GitHub)
-pi install git:github.com/<your-user>/pi-extensions
+pi install git:github.com/<your-user>/dotpi
 
 # Try without installing
-pi -e ~/Code/pi-extensions
+pi -e ~/Code/dotpi
 ```
 
 ## Project-local install
 
 ```bash
-pi install -l ~/Code/pi-extensions
+pi install -l ~/Code/dotpi
 ```
 
-This writes to `.pi/settings.json` so your team gets the same extensions automatically.
+This writes to `.pi/settings.json` so your team gets the same resources automatically.
 
 ## Adding new resources
 
@@ -41,7 +43,7 @@ Create a new directory under `extensions/`:
 ```
 extensions/
 └── my-extension/
-    └── index.ts       # Must export a default function(ExtensionAPI)
+    └── index.ts       # Must export default function(pi: ExtensionAPI)
 ```
 
 Pi auto-discovers all `.ts`/`.js` files recursively under `extensions/`.

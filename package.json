@@ -1,7 +1,7 @@
 {
-  "name": "pi-extensions",
+  "name": "dotpi",
   "version": "1.0.0",
-  "description": "Personal extensions, skills, themes, and prompts for the pi coding agent",
+  "description": "Personal pi coding agent setup — extensions, skills, themes, and prompts",
   "keywords": ["pi-package"],
   "type": "module",
   "license": "MIT",
