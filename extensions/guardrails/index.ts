@@ -1,20 +1,20 @@
 /**
  * Pi Guardrails — Entry point
  *
- * Combines all guardrail modules into a single extension.
- * Edit config.ts to customise behaviour.
+ * Combines all guard modules into a single extension.
+ * Each guard owns its own config and default values.
  */
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { config } from "./config";
-import { registerBashGate } from "./bash-gate";
-import { registerPathGate } from "./path-gate";
-import { registerSessionGuard } from "./session-guard";
-import { registerGitCheck } from "./git-check";
+import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import { BashGuard } from './src/guards/bash';
+import { PathGuard } from './src/guards/path';
+import { SessionGuard } from './src/guards/session';
+import { GitGuard } from './src/guards/git';
+
+type Guard = { register(pi: ExtensionAPI): void };
+
+const guards: Guard[] = [new BashGuard(), new PathGuard(), new SessionGuard(), new GitGuard()];
 
 export default function (pi: ExtensionAPI) {
-	registerBashGate(pi, config.bash);
-	registerPathGate(pi, config.paths);
-	registerSessionGuard(pi, config.session);
-	registerGitCheck(pi, config.git);
+    guards.forEach((g) => g.register(pi));
 }

@@ -1,21 +1,49 @@
 {
-  "name": "dotpi",
-  "version": "1.0.0",
-  "description": "Personal pi coding agent setup — extensions, skills, themes, and prompts",
-  "keywords": ["pi-package"],
-  "type": "module",
-  "license": "MIT",
-  "author": "Simone Peniti",
-  "pi": {
-    "extensions": ["./extensions"],
-    "themes": ["./themes"],
-    "skills": ["./skills"],
-    "prompts": ["./prompts"]
-  },
-  "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "*",
-    "@mariozechner/pi-ai": "*",
-    "@mariozechner/pi-tui": "*",
-    "@sinclair/typebox": "*"
-  }
+    "name": "dotpi",
+    "version": "1.0.0",
+    "description": "Personal pi coding agent setup — extensions, skills, themes, and prompts",
+    "keywords": [
+        "pi-package"
+    ],
+    "type": "module",
+    "scripts": {
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+        "test:watch": "vitest"
+    },
+    "license": "MIT",
+    "author": "Simone Peniti",
+    "pi": {
+        "extensions": [
+            "./extensions"
+        ],
+        "themes": [
+            "./themes"
+        ],
+        "skills": [
+            "./skills"
+        ],
+        "prompts": [
+            "./prompts"
+        ]
+    },
+    "peerDependencies": {
+        "@mariozechner/pi-ai": "*",
+        "@mariozechner/pi-coding-agent": "*",
+        "@mariozechner/pi-tui": "*",
+        "@sinclair/typebox": "*"
+    },
+    "devDependencies": {
+        "@eslint/js": "10.0.1",
+        "@vitest/coverage-v8": "4.1.4",
+        "eslint": "10.2.0",
+        "eslint-config-prettier": "10.1.8",
+        "prettier": "3.8.2",
+        "typescript-eslint": "8.58.1",
+        "vitest": "4.1.4"
+    }
 }
