@@ -1,0 +1,21 @@
+{
+  "name": "pi-extensions",
+  "version": "1.0.0",
+  "description": "Personal extensions, skills, themes, and prompts for the pi coding agent",
+  "keywords": ["pi-package"],
+  "type": "module",
+  "license": "MIT",
+  "author": "Simone Peniti",
+  "pi": {
+    "extensions": ["./extensions"],
+    "themes": ["./themes"],
+    "skills": ["./skills"],
+    "prompts": ["./prompts"]
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-ai": "*",
+    "@mariozechner/pi-tui": "*",
+    "@sinclair/typebox": "*"
+  }
+}
