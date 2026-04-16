@@ -8,7 +8,7 @@ Like dotfiles, but for pi.
 
 | Directory | Description |
 |-----------|-------------|
-| `extensions/guardrails/` | Safety guardrails — confirm destructive bash commands, protect sensitive paths, safeguard session actions, check dirty git repos |
+| `extensions/` | Extensions — add capabilities, intercept events, register tools |
 | `themes/` | Rosé Pine dark, moon & dawn |
 | `skills/` | Custom skills |
 | `prompts/` | Custom prompt templates |
@@ -16,11 +16,8 @@ Like dotfiles, but for pi.
 ## Install
 
 ```bash
-# From local path
-pi install ~/Code/dotpi
-
-# From git (after pushing to GitHub)
-pi install git:github.com/<your-user>/dotpi
+# From git
+pi install git:github.com/speniti/dotpi
 
 # Try without installing
 pi -e ~/Code/dotpi
@@ -71,6 +68,34 @@ themes/
 ```
 
 All resources are auto-discovered — no registration needed.
+
+## Development
+
+### Tooling
+
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run test suite |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run lint` | Lint with ESLint |
+| `npm run lint:fix` | Auto-fix lint issues |
+| `npm run format` | Format with Prettier |
+| `npm run format:check` | Check formatting |
+
+### Structure
+
+Extensions follow a consistent layout:
+
+```
+extensions/<name>/
+  index.ts               # Entry point (composition root)
+  src/guards/            # or src/tools/, src/handlers/ etc.
+  tests/
+    <name>.test.ts
+    fixtures/mocks/
+```
+
+Vitest coverage is configured to track only `src/` directories.
 
 ## License
 
