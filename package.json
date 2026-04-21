@@ -32,10 +32,10 @@
         ]
     },
     "peerDependencies": {
-        "@mariozechner/pi-ai": "^0.68",
-        "@mariozechner/pi-coding-agent": "^0.68",
-        "@mariozechner/pi-tui": "^0.68",
-        "@sinclair/typebox": "^0.34"
+        "@mariozechner/pi-ai": "^0",
+        "@mariozechner/pi-coding-agent": "^0",
+        "@mariozechner/pi-tui": "^0",
+        "@sinclair/typebox": "^0"
     },
     "devDependencies": {
         "@eslint/js": "^10",
