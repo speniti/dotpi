@@ -12,7 +12,7 @@
         "format": "prettier --write .",
         "format:check": "prettier --check .",
         "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+        "test:coverage": "vitest run --coverage",
         "test:watch": "vitest"
     },
     "license": "MIT",
@@ -32,10 +32,10 @@
         ]
     },
     "peerDependencies": {
-        "@mariozechner/pi-ai": "*",
-        "@mariozechner/pi-coding-agent": "*",
-        "@mariozechner/pi-tui": "*",
-        "@sinclair/typebox": "*"
+        "@mariozechner/pi-ai": "0.67.68",
+        "@mariozechner/pi-coding-agent": "0.67.68",
+        "@mariozechner/pi-tui": "0.67.68",
+        "@sinclair/typebox": "0.34.49"
     },
     "devDependencies": {
         "@eslint/js": "10.0.1",
