@@ -1,0 +1,127 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+permissions:
+    contents: read
+
+env:
+    NODE_VERSION: 22
+    CACHE_KEY: node-modules-${{ hashFiles('package-lock.json') }}
+
+jobs:
+    install:
+        name: 📦 Install
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+
+            - name: Restore node_modules cache
+              id: cache
+              uses: actions/cache@v4
+              with:
+                  path: node_modules
+                  key: ${{ env.CACHE_KEY }}
+
+            - name: Install dependencies
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: npm ci
+
+    audit:
+        name: 🔒 Audit
+        needs: install
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+
+            - name: Restore node_modules cache
+              uses: actions/cache@v4
+              with:
+                  path: node_modules
+                  key: ${{ env.CACHE_KEY }}
+
+            - name: Security audit
+              run: npm audit --audit-level=high
+
+    outdated:
+        name: ⏰ Outdated
+        needs: install
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+
+            - name: Restore node_modules cache
+              uses: actions/cache@v4
+              with:
+                  path: node_modules
+                  key: ${{ env.CACHE_KEY }}
+
+            - name: Check outdated dependencies
+              run: npm outdated
+              continue-on-error: true
+
+    lint:
+        name: 🔍 Lint
+        needs: [audit, outdated]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+
+            - name: Restore node_modules cache
+              uses: actions/cache@v4
+              with:
+                  path: node_modules
+                  key: ${{ env.CACHE_KEY }}
+
+            - name: Lint
+              run: npm run lint
+
+    test:
+        name: 🧪 Test
+        needs: [audit, outdated]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+
+            - name: Restore node_modules cache
+              uses: actions/cache@v4
+              with:
+                  path: node_modules
+                  key: ${{ env.CACHE_KEY }}
+
+            - name: Test with coverage (≥75%)
+              run: npm run test:coverage
