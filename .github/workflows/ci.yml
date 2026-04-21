@@ -5,9 +5,18 @@ on:
         branches: [main]
     pull_request:
         branches: [main]
+    workflow_dispatch:
+        inputs:
+            node-version:
+                description: 'Node.js version'
+                required: false
+                default: '24'
 
 permissions:
     contents: read
+
+env:
+    NODE_VERSION: ${{ github.event.inputs.node-version || '24' }}
 
 jobs:
     install:
@@ -15,16 +24,16 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
-                  node-version: 22
+                  node-version: ${{ env.NODE_VERSION }}
 
             - name: Restore node_modules cache
               id: cache
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: node_modules
                   key: node-modules-${{ hashFiles('package-lock.json') }}
@@ -39,15 +48,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
-                  node-version: 22
+                  node-version: ${{ env.NODE_VERSION }}
 
             - name: Restore node_modules cache
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: node_modules
                   key: node-modules-${{ hashFiles('package-lock.json') }}
@@ -61,15 +70,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
-                  node-version: 22
+                  node-version: ${{ env.NODE_VERSION }}
 
             - name: Restore node_modules cache
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: node_modules
                   key: node-modules-${{ hashFiles('package-lock.json') }}
@@ -84,15 +93,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
-                  node-version: 22
+                  node-version: ${{ env.NODE_VERSION }}
 
             - name: Restore node_modules cache
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: node_modules
                   key: node-modules-${{ hashFiles('package-lock.json') }}
@@ -106,15 +115,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
-                  node-version: 22
+                  node-version: ${{ env.NODE_VERSION }}
 
             - name: Restore node_modules cache
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: node_modules
                   key: node-modules-${{ hashFiles('package-lock.json') }}
