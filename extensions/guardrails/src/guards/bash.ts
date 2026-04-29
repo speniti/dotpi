@@ -16,8 +16,7 @@ export interface BashConfig {
 export const defaultConfig: BashConfig = {
     enabled: true,
     dangerousPatterns: [
-        /\brm\s+(-[a-zA-Z]*f[a-zA-Z]*\s|--force\b)/i,
-        /\brm\s+(-[a-zA-Z]*r[a-zA-Z]*\s|--recursive\b)/i,
+        /\brm\b/i,
         /\bsudo\b/i,
         /\b(chmod|chown)\b.*\b777\b/i,
         /\bgit\s+push\s+.*--force/i,

@@ -1,14 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
-import { BashGuard, defaultConfig } from '../src/guards/bash';
-import type { BashConfig } from '../src/guards/bash';
+import { PushGuard, defaultConfig } from '../src/guards/push';
+import type { PushConfig } from '../src/guards/push';
 import { createMockPi, createMockCtx } from './fixtures/mocks';
 
-describe('BashGuard', () => {
-    function setup(overrides: Partial<BashConfig> = {}) {
-        const config: BashConfig = { ...defaultConfig, ...overrides };
+describe('PushGuard', () => {
+    function setup(overrides: Partial<PushConfig> = {}) {
+        const config: PushConfig = { ...defaultConfig, ...overrides };
         const mock = createMockPi();
 
-        new BashGuard(config).register(mock.api);
+        new PushGuard(config).register(mock.api);
 
         return mock;
     }
@@ -29,17 +29,17 @@ describe('BashGuard', () => {
         expect(result).toBeUndefined();
     });
 
-    it('passes through safe commands', async () => {
+    it('passes through non-push git commands', async () => {
         const mock = setup();
         const result = await mock.emit('tool_call', {
             toolName: 'bash',
-            input: { command: 'ls -la' },
+            input: { command: 'git status' },
         });
 
         expect(result).toBeUndefined();
     });
 
-    it('blocks dangerous commands without UI', async () => {
+    it('blocks push commands without UI', async () => {
         const mock = setup();
         const ctx = createMockCtx({ hasUI: false });
 
@@ -47,7 +47,7 @@ describe('BashGuard', () => {
             'tool_call',
             {
                 toolName: 'bash',
-                input: { command: 'rm -rf /tmp/test' },
+                input: { command: 'git push origin main' },
             },
             ctx,
         );
@@ -61,7 +61,7 @@ describe('BashGuard', () => {
         const ctx = createMockCtx({
             ui: {
                 ...createMockCtx().ui,
-                select: vi.fn().mockResolvedValue('No, block it'),
+                select: vi.fn().mockResolvedValue('No, cancel push'),
             },
         });
 
@@ -69,12 +69,12 @@ describe('BashGuard', () => {
             'tool_call',
             {
                 toolName: 'bash',
-                input: { command: 'sudo apt install something' },
+                input: { command: 'git push origin main' },
             },
             ctx,
         );
 
-        expect(result).toEqual({ block: true, reason: 'Blocked by user' });
+        expect(result).toEqual({ block: true, reason: 'Push cancelled by user' });
     });
 
     it("prompts user and allows on 'Yes'", async () => {
@@ -83,7 +83,7 @@ describe('BashGuard', () => {
         const ctx = createMockCtx({
             ui: {
                 ...createMockCtx().ui,
-                select: vi.fn().mockResolvedValue('Yes, run it'),
+                select: vi.fn().mockResolvedValue('Yes, push it'),
             },
         });
 
@@ -91,7 +91,7 @@ describe('BashGuard', () => {
             'tool_call',
             {
                 toolName: 'bash',
-                input: { command: 'sudo apt install something' },
+                input: { command: 'git push origin main' },
             },
             ctx,
         );
@@ -99,20 +99,29 @@ describe('BashGuard', () => {
         expect(result).toBeUndefined();
     });
 
-    it('blocks rm without flags', async () => {
+    it('detects push with various flags', async () => {
         const mock = setup();
         const ctx = createMockCtx({ hasUI: false });
 
-        const result = await mock.emit(
-            'tool_call',
-            {
-                toolName: 'bash',
-                input: { command: 'rm /tmp/test-file.txt' },
-            },
-            ctx,
-        );
+        const commands = [
+            'git push origin main',
+            'git push --force origin main',
+            'git push -u origin feature-branch',
+            'git push',
+        ];
 
-        expect(result).toEqual({ block: true, reason: expect.any(String) });
+        for (const command of commands) {
+            const result = await mock.emit(
+                'tool_call',
+                {
+                    toolName: 'bash',
+                    input: { command },
+                },
+                ctx,
+            );
+
+            expect(result).toEqual({ block: true, reason: expect.any(String) });
+        }
     });
 
     it('does not register when disabled', () => {
