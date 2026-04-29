@@ -115,6 +115,37 @@ describe('BashGuard', () => {
         expect(result).toEqual({ block: true, reason: expect.any(String) });
     });
 
+    it("prompts user and blocks on 'Suggest changes'", async () => {
+        const mock = setup();
+        const mockInput = vi.fn().mockResolvedValue('use rm -f instead');
+
+        const ctx = createMockCtx({
+            ui: {
+                ...createMockCtx().ui,
+                select: vi.fn().mockResolvedValue('Suggest changes'),
+                input: mockInput,
+            },
+        });
+
+        const result = await mock.emit(
+            'tool_call',
+            {
+                toolName: 'bash',
+                input: { command: 'rm -rf /tmp/test' },
+            },
+            ctx,
+        );
+
+        expect(ctx.ui.select).toHaveBeenCalledWith(
+            expect.stringContaining('Dangerous command:'),
+            ['Yes, run it', 'No, block it', 'Suggest changes'],
+            expect.any(Object),
+        );
+        expect(mockInput).toHaveBeenCalledWith('Enter your suggestions for changes:');
+        expect(ctx.ui.notify).toHaveBeenCalledWith('Suggestions noted: use rm -f instead');
+        expect(result).toEqual({ block: true, reason: 'Command blocked - changes suggested by user' });
+    });
+
     it('does not register when disabled', () => {
         const mock = setup({ enabled: false });
 

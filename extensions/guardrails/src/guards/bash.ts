@@ -50,14 +50,21 @@ export class BashGuard {
 
             const choice = await ctx.ui.select(
                 `⚠️  Dangerous command:\n\n  ${command}\n\nAllow execution?`,
-                ['Yes, run it', 'No, block it'],
+                ['Yes, run it', 'No, block it', 'Suggest changes'],
                 confirmOpts,
             );
 
-            if (choice !== 'Yes, run it') {
+            if (choice === 'No, block it') {
                 ctx.ui.notify('Command blocked', 'warning');
 
                 return { block: true, reason: 'Blocked by user' };
+            }
+
+            if (choice === 'Suggest changes') {
+                const suggestions = await ctx.ui.input('Enter your suggestions for changes:');
+                ctx.ui.notify(`Suggestions noted: ${suggestions || '(no suggestions provided)'}`);
+
+                return { block: true, reason: 'Command blocked - changes suggested by user' };
             }
         });
     }
