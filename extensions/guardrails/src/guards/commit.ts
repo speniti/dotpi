@@ -30,7 +30,7 @@ export class CommitGuard {
             if (!command) return;
 
             // Match git commit commands (with or without flags)
-            if (!/^\s*git\s+commit\b/.test(command)) return;
+            if (!/\bgit\s+commit\b/.test(command)) return;
 
             if (!ctx.hasUI) {
                 return { block: true, reason: 'Git commit requires user approval (no UI available)' };

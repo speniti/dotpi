@@ -7,6 +7,8 @@ Safety guardrails for pi — intercept destructive actions and require user conf
 | Guard | Event | Behaviour |
 |-------|-------|-----------|
 | **Bash** | `tool_call` (bash) | Blocks commands matching dangerous patterns (`rm -rf`, `sudo`, `chmod 777`, `git push --force`). Prompts user for confirmation. |
+| **Commit** | `tool_call` (bash) | Intercepts git commit commands and requires user approval before proceeding. |
+| **Push** | `tool_call` (bash) | Intercepts git push commands and requires user approval before proceeding. |
 | **Path** | `tool_call` (write/edit) | Blocks writes to protected paths (`.env`, `.git/`, `node_modules/`, `package-lock.json`). Silent mode available. |
 | **Session** | `session_before_switch` / `session_before_fork` | Requires confirmation before clearing, switching, or forking a session. |
 | **Git** | `session_before_switch` / `session_before_fork` | Prevents session switch/fork when there are uncommitted git changes. Optional override. |
@@ -35,6 +37,8 @@ extensions/guardrails/
   index.ts                 # Composition root — registers all guards
   src/guards/
     bash.ts                # BashConfig + defaultConfig + BashGuard
+    commit.ts              # CommitConfig + defaultConfig + CommitGuard
+    push.ts                # PushConfig + defaultConfig + PushGuard
     path.ts                # PathConfig + defaultConfig + PathGuard
     session.ts             # SessionConfig + defaultConfig + SessionGuard
     git.ts                 # GitConfig + defaultConfig + GitGuard
