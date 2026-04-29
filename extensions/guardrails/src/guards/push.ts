@@ -30,7 +30,7 @@ export class PushGuard {
             if (!command) return;
 
             // Match git push commands (with or without flags)
-            if (!/^\s*git\s+push\b/.test(command)) return;
+            if (!/\bgit\s+push\b/.test(command)) return;
 
             if (!ctx.hasUI) {
                 return { block: true, reason: 'Git push requires user approval (no UI available)' };
