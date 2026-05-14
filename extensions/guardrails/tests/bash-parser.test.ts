@@ -56,8 +56,8 @@ describe('bash-parser (WASM)', () => {
     it('parses redirects', () => {
         const result = parseBash('echo hello > /tmp/out.txt');
         expect(result).not.toBeNull();
-        expect(result!.length).toBeGreaterThanOrEqual(1);
-        const last = result![result!.length - 1];
+        expect(result).toBeInstanceOf(Array);
+        const last = (result as NonNullable<typeof result>)[result.length - 1];
         expect(last.redirects).toEqual([{ op: '>', target: '/tmp/out.txt' }]);
     });
 
