@@ -1,27 +1,14 @@
-/**
- * Bash Guard
- *
- * Intercepts bash tool calls that match dangerous patterns
- * and requires explicit user confirmation before execution.
- */
-
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI, ExtensionContext, ToolCallEventResult } from '@earendil-works/pi-coding-agent';
+import { parseBash, type ParsedCommand } from '../bash-parser';
+import { matchDangerous, type DangerMatch } from '../matchers';
 
 export interface BashConfig {
     enabled: boolean;
-    dangerousPatterns: RegExp[];
-    confirmTimeout: number;
+    confirmTimeout?: number;
 }
 
 export const defaultConfig: BashConfig = {
     enabled: true,
-    dangerousPatterns: [
-        /\brm\b/i,
-        /\bsudo\b/i,
-        /\b(chmod|chown)\b.*\b777\b/i,
-        /\bgit\s+push\s+.*--force/i,
-    ],
-    confirmTimeout: 0,
 };
 
 export class BashGuard {
@@ -36,36 +23,76 @@ export class BashGuard {
             const command = event.input.command as string;
             if (!command) return;
 
-            const isDangerous = this.config.dangerousPatterns.some((p) => p.test(command));
-            if (!isDangerous) return;
-
-            if (!ctx.hasUI) {
-                return { block: true, reason: 'Dangerous command blocked (no UI for confirmation)' };
-            }
-
-            const confirmOpts: { timeout?: number } = {};
-            if (this.config.confirmTimeout > 0) {
-                confirmOpts.timeout = this.config.confirmTimeout;
-            }
-
-            const choice = await ctx.ui.select(
-                `⚠️  Dangerous command:\n\n  ${command}\n\nAllow execution?`,
-                ['Yes, run it', 'No, block it', 'Suggest changes'],
-                confirmOpts,
-            );
-
-            if (choice === 'No, block it') {
-                ctx.ui.notify('Command blocked', 'warning');
-
-                return { block: true, reason: 'Blocked by user' };
-            }
-
-            if (choice === 'Suggest changes') {
-                const suggestions = await ctx.ui.input('Enter your suggestions for changes:');
-                ctx.ui.notify(`Suggestions noted: ${suggestions || '(no suggestions provided)'}`);
-
-                return { block: true, reason: 'Command blocked - changes suggested by user' };
-            }
+            return this.analyseCommand(command, ctx);
         });
+    }
+
+    private async analyseCommand(command: string, ctx: ExtensionContext): Promise<ToolCallEventResult | undefined> {
+        const commands = parseBash(command);
+        if (!commands) return this.handleUnparseable(command, ctx);
+
+        const danger = this.findDanger(commands);
+        if (!danger) return;
+
+        return this.confirmDangerous(command, danger, ctx);
+    }
+
+    private findDanger(commands: ParsedCommand[]): DangerMatch | undefined {
+        for (const cmd of commands) {
+            const match = matchDangerous(cmd);
+
+            if (match) return match;
+        }
+
+        return undefined;
+    }
+
+    private async handleUnparseable(command: string, ctx: ExtensionContext): Promise<ToolCallEventResult | undefined> {
+        if (!ctx.hasUI) {
+            return { block: true, reason: 'Command blocked: unable to parse for safety checks' };
+        }
+
+        const choice = await ctx.ui.select(
+            `⚠️  Unable to parse command for safety analysis:\n\n  ${command}\n\nAllow execution anyway?`,
+            ['Yes, run it', 'No, block it'],
+        );
+
+        if (choice !== 'Yes, run it') {
+            ctx.ui.notify('Command blocked', 'warning');
+
+            return { block: true, reason: 'Blocked by user (unparseable command)' };
+        }
+    }
+
+    private async confirmDangerous(
+        command: string,
+        danger: DangerMatch,
+        ctx: ExtensionContext,
+    ): Promise<ToolCallEventResult | undefined> {
+        if (!ctx.hasUI) {
+            return { block: true, reason: `Dangerous command blocked: ${danger.description}` };
+        }
+
+        const choice = await ctx.ui.select(
+            `⚠️  Dangerous command (${danger.description}):\n\n  ${command}\n\nAllow execution?`,
+            ['Yes, run it', 'No, block it', 'Suggest changes'],
+            { timeout: this.config.confirmTimeout },
+        );
+
+        if (choice === 'No, block it') return this.blockedByUser(ctx);
+        if (choice === 'Suggest changes') return this.suggestChanges(ctx);
+    }
+
+    private blockedByUser(ctx: ExtensionContext): ToolCallEventResult {
+        ctx.ui.notify('Command blocked', 'warning');
+
+        return { block: true, reason: 'Blocked by user' };
+    }
+
+    private async suggestChanges(ctx: ExtensionContext): Promise<ToolCallEventResult> {
+        const suggestions = await ctx.ui.input('Enter your suggestions for changes:');
+        ctx.ui.notify(`Suggestions noted: ${suggestions || '(no suggestions provided)'}`);
+
+        return { block: true, reason: 'Command blocked - changes suggested by user' };
     }
 }
