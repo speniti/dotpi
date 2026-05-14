@@ -2,6 +2,14 @@
 
 All notable changes to `speniti/dotpi` will be documented in this file.
 
+## v0.3.0 - 2026-05-14
+
+### What's Changed
+
+### 🚀 New Features
+
+* feat(guardrails): replace regex matching with tree-sitter AST parser (#6) @speniti
+
 ## v0.2.2 - 2026-04-29
 
 ### What's Changed
